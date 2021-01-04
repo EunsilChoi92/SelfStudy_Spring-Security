@@ -14,10 +14,11 @@ spring:
     username: root
     password: koreait2020
     
-  mvc:
-    view:
-      prefix: /templates/
-      suffix: .mustache
+#  mvc:
+#    view:
+#      prefix: /templates/
+#      suffix: .mustache
+# 삭제해도 되는 이유 : pom.xml에 dependency가 추가되어 있으면 자동으로 경로 설정을 함
 
   jpa:
     hibernate:
