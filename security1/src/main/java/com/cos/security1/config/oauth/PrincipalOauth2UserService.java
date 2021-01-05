@@ -9,6 +9,9 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
 import com.cos.security1.config.auth.PrincipalDetails;
+import com.cos.security1.config.oauth.provider.FacebookUserInfo;
+import com.cos.security1.config.oauth.provider.GoogleUserInfo;
+import com.cos.security1.config.oauth.provider.OAuth2UserInfo;
 import com.cos.security1.model.User;
 import com.cos.security1.repository.UserRepository;
 
@@ -40,18 +43,41 @@ public class PrincipalOauth2UserService extends DefaultOAuth2UserService {
 		// role은 ROLE_USER
 		// 어차피 구글 로그인 폼으로 로그인을 할 거라서 password는 아무거나 해도 상관 없음
 		// 일반 로그인인지 구글 로그인인지 구분하기 위해 User 테이블에 컬럼을 더 추가함
+		
+		OAuth2UserInfo oAuth2UserInfo = null;
+		switch(userRequest.getClientRegistration().getRegistrationId()) {
+			case "google" : 
+				System.out.println("구글 로그인 요청");
+				oAuth2UserInfo = new GoogleUserInfo(oauth2User.getAttributes());
+				break;
+			case "facebook" : 
+				System.out.println("페이스북 로그인 요청");
+				oAuth2UserInfo = new FacebookUserInfo(oauth2User.getAttributes());
+				break;
+			default :
+				System.out.println("구글과 페이스북만 지원합니다.");
+		}
 
+		/*
+		<구글 로그인만 있을 경우 - 유지보수가 용이하지 않음>
 		String provider = userRequest.getClientRegistration().getRegistrationId(); // google
 		String providerId = oauth2User.getAttribute("sub"); 
 		String username = provider + "_" + providerId;
 		String password = bCryptPasswordEncoder.encode("getinthere");
 		String email = oauth2User.getAttribute("email");
 		String role = "ROLE_USER";
+		*/
+		
+		String provider = oAuth2UserInfo.getProvider(); // google
+		String providerId = oAuth2UserInfo.getProviderId(); 
+		String username = provider + "_" + providerId;
+		String password = bCryptPasswordEncoder.encode("getinthere");
+		String email = oAuth2UserInfo.getEmail();
+		String role = "ROLE_USER";
 		
 		User userEntity = userRepository.findByUsername(username);
 		
 		if(userEntity == null) {
-			System.out.println("구글 로그인이 최초입니다.");
 			userEntity = User.builder()
 					.username(username)
 					.password(password)
@@ -61,9 +87,7 @@ public class PrincipalOauth2UserService extends DefaultOAuth2UserService {
 					.providerId(providerId)
 					.build();
 			userRepository.save(userEntity);
-		} else {
-			System.out.println("이미 구글 로그인을 한 적이 있습니다.");
-		}
+		} 
 		
 		return new PrincipalDetails(userEntity, oauth2User.getAttributes());
 	}
