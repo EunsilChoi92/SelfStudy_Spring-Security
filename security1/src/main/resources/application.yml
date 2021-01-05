@@ -14,11 +14,26 @@ spring:
     username: root
     password: koreait2020
     
+  mvc:
+    view:
+      prefix: /templates/
+      suffix: .mustache
+
   jpa:
-    generate-ddl: true
     hibernate:
       ddl-auto: update #create update none
       naming:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
     show-sql: true
-    format_sql: true
+    
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: 367078370738-nalmbehd3d42hhc6873e91rolll4nm7g.apps.googleusercontent.com
+            client-secret: 0RsnI41DrgqGqrtiIP21PfGJ
+            scope:
+            - email
+            - profile
+            

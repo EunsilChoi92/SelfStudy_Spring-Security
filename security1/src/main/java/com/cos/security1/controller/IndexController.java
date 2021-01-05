@@ -3,12 +3,16 @@ package com.cos.security1.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.cos.security1.config.auth.PrincipalDetails;
 import com.cos.security1.model.User;
 import com.cos.security1.repository.UserRepository;
 
@@ -21,6 +25,39 @@ public class IndexController {
 	@Autowired
 	private BCryptPasswordEncoder bCryptPasswordEncoder;
 	
+	@GetMapping("/test/login")
+	public @ResponseBody String testLogin(Authentication authentication
+			, @AuthenticationPrincipal PrincipalDetails userDetails) { // DI(의존성 주입)
+		// @AuthenticationPrincipal 을 통해서 세션 정보에 접근할 수 있음
+		System.out.println("/test/login ==================");
+		
+		// 첫 번째 방법
+		PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
+		System.out.println("authentication : " + principalDetails.getUser());
+		
+		// 두 번째 방법
+		System.out.println("userDetails : " + userDetails.getUser());
+		
+		return "세션 정보 확인하기";
+	}
+	
+	// 소셜 로그인을 할 때에는 PrincipalDetails이 아니라 OAuth2User로 casting 해야 함
+	@GetMapping("/test/oauth/login")
+	public @ResponseBody String testOAuthLogin(Authentication authentication
+			, @AuthenticationPrincipal OAuth2User oauth) {
+		System.out.println("/test/oauth/login ==================");
+		
+		// 첫 번째 방법
+		OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
+		System.out.println("authentication : " + oAuth2User.getAttributes());
+		
+		// 두 번째 방법
+		System.out.println("oauth2User : " + oauth.getAttributes());
+		
+		
+		return "세션 정보 확인하기";
+	}
+	
 	// localhost:8080/
 	// localhost:8080
 	@GetMapping({"","/"})
@@ -32,8 +69,10 @@ public class IndexController {
 		// view resolver를 오버라이딩 해서 index.html 파일과 매핑되도록 함
 	}
 	
+	// OAuth 로그인, 일반 로그인 둘 다 PrincipalDetails로 받을 수 있음
 	@GetMapping("/user")
-	public @ResponseBody String user() {
+	public @ResponseBody String user(@AuthenticationPrincipal PrincipalDetails principalDetails) {
+		System.out.println("principalDetails : " + principalDetails.getUser());
 		return "user";
 	}
 	
