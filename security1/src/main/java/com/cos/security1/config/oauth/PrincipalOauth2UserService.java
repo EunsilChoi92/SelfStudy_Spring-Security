@@ -89,7 +89,7 @@ public class PrincipalOauth2UserService extends DefaultOAuth2UserService {
 			userRepository.save(userEntity);
 			System.out.println(userEntity.getProvider() + "로그인에 성공했습니다.");
 		} else {
-			System.out.println("이미 로그인을 한 적이 있습니다.");
+			System.out.println("이미 로그인을 한 적이 있습니다. ");
 		}
 		
 		return new PrincipalDetails(userEntity, oauth2User.getAttributes());
