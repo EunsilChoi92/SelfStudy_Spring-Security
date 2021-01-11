@@ -54,6 +54,8 @@ public class PrincipalOauth2UserService extends DefaultOAuth2UserService {
 				System.out.println("페이스북 로그인 요청");
 				oAuth2UserInfo = new FacebookUserInfo(oauth2User.getAttributes());
 				break;
+			case "naver" :
+				break;
 			default :
 				System.out.println("구글과 페이스북만 지원합니다.");
 		}
