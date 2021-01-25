@@ -1,1 +1,1 @@
-# SelfStudy_Spring-Security1122
+# SelfStudy_Spring-Security
